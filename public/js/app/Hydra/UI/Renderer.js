@@ -37,8 +37,9 @@ define(['Hydra/Socket/Client'], function (client) {
                 _game.state.start('Winner');
                 return;
             }
-            if (data.planets) {
-                _serverPlanets = JSON.parse(e.data).planets;
+            if (data.planetsWithPlayers) {
+                console.log(e.data)
+                _serverPlanets = JSON.parse(e.data).planetsWithPlayers;
                 _createInitialPlanets();
                 _updateSelectedPlanet();
                 _renderPlanets();
@@ -66,6 +67,7 @@ define(['Hydra/Socket/Client'], function (client) {
     };
 
     var _createClientPlanet = function (serverPlanet) {
+        serverPlanet = serverPlanet.planet
         var planet = _game.add.image(serverPlanet.position.x, serverPlanet.position.y, 'planet-green');
         planet.name = serverPlanet.name;
 
@@ -80,7 +82,7 @@ define(['Hydra/Socket/Client'], function (client) {
     var _renderPlanets = function () {
         _galaxy.forEach(function (clientPlanet) {
             for (var j = 0; j < _serverPlanets.length; j++) {
-                if (_serverPlanets[j].name == clientPlanet.name) {
+                if (_serverPlanets[j].planet.name == clientPlanet.name) {
                     _renderPlanet(clientPlanet, _serverPlanets[j]);
 
                     break;
@@ -91,10 +93,11 @@ define(['Hydra/Socket/Client'], function (client) {
 
     var _renderPlanet = function (clientPlanet, serverPlanet) {
         var usernameText = '';
-
         if (serverPlanet.player) {
-            usernameText = ' <' + serverPlanet.player.username + '> ';
+            usernameText = ' <' + serverPlanet.player.name + '> ';
         }
+
+        serverPlanet = serverPlanet.planet
 
         if (clientPlanet.children.length && clientPlanet.children[0].text) {
             clientPlanet.children[0].text = serverPlanet.name + usernameText + ' [' + serverPlanet.population + ']';
@@ -117,7 +120,7 @@ define(['Hydra/Socket/Client'], function (client) {
             });
 
             clientPlanet.events.onInputOut.add(function () {
-                textLabel.text = serverPlanet.name + ' [' + serverPlanet.population + ']';
+                textLabel.text = serverPlanet.name + usernameText + ' [' + serverPlanet.population + ']';
             });
 
             clientPlanet.events.onInputDown.add(function () {
