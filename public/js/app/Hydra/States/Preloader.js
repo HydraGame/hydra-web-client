@@ -12,6 +12,7 @@ define(['Hydra/UI/KeyboardCameraNavigator'], function (keyboardCameraNavigator) 
         _game.load.image('planet-gold', 'img/planet-gold-16x16.png');
         _game.load.image('planet-blue', 'img/planet-blue-16x16.png');
         _game.load.image('colony-ship', 'img/colony-ship-16x16.png');
+        _game.load.image('battle-cruiser', 'img/battle-cruiser-16x16.png');
         _game.load.spritesheet('generate-galaxy', 'img/buttons/button-generate-galaxy.png', 123, 22);
         _game.load.spritesheet('back-to-galaxy', 'img/buttons/btn-back-to-galaxy.png', 130, 47);
         _game.load.spritesheet('build-starport', 'img/buttons/button-build-starport.png', 178, 40);
@@ -35,7 +36,7 @@ define(['Hydra/UI/KeyboardCameraNavigator'], function (keyboardCameraNavigator) 
         create: function (game) {
             keyboardCameraNavigator.init(game.camera, game.input.keyboard);
 
-            game.state.start('Game');
+            game.state.start('Login');
         }
     };
 });

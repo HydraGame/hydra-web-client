@@ -33,26 +33,27 @@ define(['Hydra/Socket/Client'], function (client) {
                 );
             });
 
+            if (!_game._selectedPlanet.player || _game.player.name !== _game._selectedPlanet.player.name) {
+                var text =
+                    game.add.text(
+                        400,
+                        205,
+                        "Attack!",
+                        {font: "25px Arial", fill: "#ff0044", align: "center"}
+                    );
 
-            var text = game.add.text(
-                400,
-                205,
-                "Colonize planet",
-                {font: "25px Arial", fill: "#ff0044", align: "center"}
-            );
-
-            text.inputEnabled = true;
-            text.events.onInputDown.add(function () {
-                client.getConnection().send(
-                    JSON.stringify({
-                        command: 'colonizePlanet',
-                        galaxyName: 'Andromeda',
-                        username: _game.player.username,
-                        planetName: _game._selectedPlanet.name
-                    })
-                );
-                _game.state.start('Game');
-            }, this);
+                text.inputEnabled = true;
+                text.events.onInputDown.add(function () {
+                    client.getConnection().send(
+                        JSON.stringify({
+                            command: 'attack',
+                            username: _game.player.username,
+                            planetName: _game._selectedPlanet.name
+                        })
+                    );
+                    _game.state.start('Game');
+                }, this);
+            }
 
             var textContent = 'Planet name: ' + _game._selectedPlanet.name + ' \n';
             textContent += 'Population: ' + _game._selectedPlanet.population + '\n';

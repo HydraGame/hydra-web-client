@@ -37,9 +37,9 @@ define(['Hydra/Socket/Client'], function (client) {
                 _game.state.start('Winner');
                 return;
             }
-            if (data.planetsWithPlayers) {
+            if (data.planets) {
                 console.log(e.data)
-                _serverPlanets = JSON.parse(e.data).planetsWithPlayers;
+                _serverPlanets = JSON.parse(e.data).planets;
                 _createInitialPlanets();
                 _updateSelectedPlanet();
                 _renderPlanets();
@@ -67,13 +67,37 @@ define(['Hydra/Socket/Client'], function (client) {
     };
 
     var _createClientPlanet = function (serverPlanet) {
+        var player = serverPlanet.player
+        var fleet = serverPlanet.fleet
         serverPlanet = serverPlanet.planet
         var planet = _game.add.image(serverPlanet.position.x, serverPlanet.position.y, 'planet-green');
         planet.name = serverPlanet.name;
 
-        if (serverPlanet.player && serverPlanet.player.fleet) {
-            var ship = _game.add.image(serverPlanet.position.x, serverPlanet.position.y - 20, 'colony-ship');
-            _galaxy.addChild(ship);
+        var slugify = function(text) {
+          return text.toString().toLowerCase()
+            .replace(/\s+/g, '-')           // Replace spaces with -
+            .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+            .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+            .replace(/^-+/, '')             // Trim - from start of text
+            .replace(/-+$/, '');            // Trim - from end of text
+        }
+
+        if (player && fleet) {
+            if (player != undefined && player.name == _game.player.username) {
+                for (i = 0; i < fleet.squads.length; i++) {
+                    var squad = fleet.squads[i];
+                    var yPos = serverPlanet.position.y - (20 * (i + 1)
+                    );
+
+                    for (j = 0; j < squad.count; j++) {
+                        var xPos = serverPlanet.position.x + j * 20;
+                        var gameShip = _game.add.image(xPos, yPos, slugify(squad.ship.name));
+
+                        _galaxy.addChild(gameShip);
+                    }
+                }
+            }
+
         }
 
         _galaxy.addChild(planet);
@@ -97,17 +121,23 @@ define(['Hydra/Socket/Client'], function (client) {
             usernameText = ' <' + serverPlanet.player.name + '> ';
         }
 
-        serverPlanet = serverPlanet.planet
+        planet = serverPlanet.planet
 
         if (clientPlanet.children.length && clientPlanet.children[0].text) {
-            clientPlanet.children[0].text = serverPlanet.name + usernameText + ' [' + serverPlanet.population + ']';
+            clientPlanet.children[0].text = planet.name + usernameText + ' [' + planet.population + ']';
         } else {
-            var textLabel = _game.add.text(10, 10, serverPlanet.name + usernameText +  ' [' + serverPlanet.population + ']', {
+            var color = "#ffffff"
+
+            if (serverPlanet.player != undefined && serverPlanet.player.name == _game.player.username) {
+                color = "#3fef06"
+            }
+
+            var textLabel = _game.add.text(10, 10, planet.name + usernameText +  ' [' + planet.population + ']', {
                 font: "12px Arial",
-                fill: "#fff"
+                fill: color
             });
 
-            clientPlanet.name = serverPlanet.name;
+            clientPlanet.name = planet.name;
             clientPlanet.inputEnabled = true;
             clientPlanet.input.useHandCursor = true;
 
@@ -115,12 +145,11 @@ define(['Hydra/Socket/Client'], function (client) {
             textLabel.y = clientPlanet.height + 2;
 
             clientPlanet.events.onInputOver.add(function () {
-                textLabel.text += '\n[x: ' + serverPlanet.position.x + ', y: ' + serverPlanet.position.y + ']';
-                textLabel.text += '\n[population: ' + serverPlanet.population + ']';
+                textLabel.text += '\n[x: ' + planet.position.x + ', y: ' + planet.position.y + ']';
             });
 
             clientPlanet.events.onInputOut.add(function () {
-                textLabel.text = serverPlanet.name + usernameText + ' [' + serverPlanet.population + ']';
+                textLabel.text = planet.name + usernameText + ' [' + planet.population + ']';
             });
 
             clientPlanet.events.onInputDown.add(function () {

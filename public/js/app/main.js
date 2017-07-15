@@ -4,6 +4,7 @@ define(function (require) {
 
     var boot = require('Hydra/States/Boot');
     var preloader = require('Hydra/States/Preloader');
+    var login = require('Hydra/States/Login');
     var hydraGame = require('Hydra/States/Game');
     var planetView = require('Hydra/States/PlanetView');
     var winner = require('Hydra/States/Winner');
@@ -11,6 +12,7 @@ define(function (require) {
     var game = new Phaser.Game(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, Phaser.AUTO, 'game');
     game.state.add('Boot', boot);
     game.state.add('Preloader', preloader);
+    game.state.add('Login', login);
     game.state.add('Game', hydraGame);
     game.state.add('PlanetView', planetView);
     game.state.add('Winner', winner);
