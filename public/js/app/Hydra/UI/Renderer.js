@@ -117,22 +117,34 @@ define(['Hydra/Socket/Client'], function (client) {
 
     var _renderPlanet = function (clientPlanet, serverPlanet) {
         var usernameText = '';
+        var populationText = '';
+        var myPlanet = false;
+
         if (serverPlanet.player) {
             usernameText = ' <' + serverPlanet.player.name + '> ';
         }
 
-        planet = serverPlanet.planet
+        planet = serverPlanet.planet;
+
+        if (serverPlanet.player != undefined && serverPlanet.player.name == _game.player.username) {
+            myPlanet = true;
+            populationText = ' [' + planet.population + ']'
+        }
 
         if (clientPlanet.children.length && clientPlanet.children[0].text) {
-            clientPlanet.children[0].text = planet.name + usernameText + ' [' + planet.population + ']';
+            clientPlanet.children[0].text = planet.name + usernameText + populationText;
         } else {
-            var color = "#ffffff"
+            var color = "#ffffff";
 
-            if (serverPlanet.player != undefined && serverPlanet.player.name == _game.player.username) {
-                color = "#3fef06"
+            if (serverPlanet.player != undefined) {
+                if (serverPlanet.player.name == _game.player.username) {
+                    color = "#3fef06";
+                } else {
+                    color = "#f07373";
+                }
             }
 
-            var textLabel = _game.add.text(10, 10, planet.name + usernameText +  ' [' + planet.population + ']', {
+            var textLabel = _game.add.text(10, 10, planet.name + usernameText + populationText, {
                 font: "12px Arial",
                 fill: color
             });
@@ -144,13 +156,15 @@ define(['Hydra/Socket/Client'], function (client) {
             textLabel.x = ((clientPlanet.width + textLabel.width) / 2) - textLabel.width;
             textLabel.y = clientPlanet.height + 2;
 
-            clientPlanet.events.onInputOver.add(function () {
-                textLabel.text += '\n[x: ' + planet.position.x + ', y: ' + planet.position.y + ']';
-            });
+            if (myPlanet) {
+                clientPlanet.events.onInputOver.add(function () {
+                    textLabel.text += '\n[x: ' + planet.position.x + ', y: ' + planet.position.y + ']';
+                });
 
-            clientPlanet.events.onInputOut.add(function () {
-                textLabel.text = planet.name + usernameText + ' [' + planet.population + ']';
-            });
+                clientPlanet.events.onInputOut.add(function () {
+                    textLabel.text = planet.name + usernameText + populationText;
+                });
+            }
 
             clientPlanet.events.onInputDown.add(function () {
                 _game._selectedPlanet = serverPlanet;
