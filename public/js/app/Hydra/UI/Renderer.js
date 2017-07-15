@@ -83,7 +83,7 @@ define(['Hydra/Socket/Client'], function (client) {
         }
 
         if (player && fleet) {
-            if (player != undefined && player.name == _game.player.username) {
+            if (player != undefined  && _game.player != undefined && player.name == _game.player.username) {
                 for (i = 0; i < fleet.squads.length; i++) {
                     var squad = fleet.squads[i];
                     var yPos = serverPlanet.position.y - (20 * (i + 1)
@@ -126,7 +126,7 @@ define(['Hydra/Socket/Client'], function (client) {
 
         planet = serverPlanet.planet;
 
-        if (serverPlanet.player != undefined && serverPlanet.player.name == _game.player.username) {
+        if (serverPlanet.player != undefined && _game.player != undefined && serverPlanet.player.name == _game.player.username) {
             myPlanet = true;
             populationText = ' [' + planet.population + ']'
         }
@@ -137,7 +137,7 @@ define(['Hydra/Socket/Client'], function (client) {
             var color = "#ffffff";
 
             if (serverPlanet.player != undefined) {
-                if (serverPlanet.player.name == _game.player.username) {
+                if (_game.player != undefined && serverPlanet.player.name == _game.player.username) {
                     color = "#3fef06";
                 } else {
                     color = "#f07373";
