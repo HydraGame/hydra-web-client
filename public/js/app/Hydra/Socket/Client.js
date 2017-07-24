@@ -12,7 +12,7 @@ define(function () {
     };
 
     var _addMessageCallback = function(callback) {
-        _getSocket().onmessage = callback;
+        _getSocket().onmessage = callback
     };
 
     return {

@@ -44,11 +44,7 @@ define(['Hydra/Socket/Client'], function (client) {
                 attack.inputEnabled = true;
                 attack.events.onInputDown.add(function () {
                     client.getConnection().send(
-                        JSON.stringify({
-                            command: 'attack',
-                            username: game.player.username,
-                            planetName: game._selectedPlanet.name
-                        })
+                        "attack"
                     );
                     game.state.start('Game');
                 }, this);
