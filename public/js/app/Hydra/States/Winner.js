@@ -1,25 +1,25 @@
 define(['Hydra/Socket/Client'], function (client) {
-    var _game = null;
-    var _textLabel = null;
+    //@todo: load this from galaxy JSON, as this is currently hard-coded
+    var WORLD_WIDTH = 2560;
+    var WORLD_HEIGHT = 2560;
 
     return {
         create: function (game) {
-            _game = game;
-            _game.stage.bg.width = 200;
-            _game.stage.bg.height = 200;
-            _game.stage.setBackgroundColor(0x00ffa8);
+            game = game;
+            game.stage.bg.width = 200;
+            game.stage.bg.height = 200;
+            game.stage.setBackgroundColor(0x000000);
 
+            game.stage.bg = bg;
 
-            if (_game.winner && game.winner.username) {
-                var textContent = 'Congratulations! The winner is: ' + _game.winner.username + '!!!';
+            if (game.winner && game.winner.name) {
+                var textContent = 'Congratulations! The winner is: ' + game.winner.name + '!!!';
 
-                _textLabel = _game.add.text(50, 50, textContent, {
+                _textLabel = game.add.text(300, 240, textContent, {
                     font: "24px Arial",
-                    fill: "#001910"
+                    fill: "#00ffa8"
                 });
             }
-
-
         }
     };
 });

@@ -9,7 +9,7 @@ define(['Hydra/Socket/Client'], function (client) {
 
             var planet = game._selectedPlanet.planet;
             var planetPlayer = game._selectedPlanet.player;
-            var myPlanet = planetPlayer != undefined && planetPlayer.name == game.player.username;
+            var myPlanet = planetPlayer !== undefined && planetPlayer.name === game.player.username;
             var textContent = 'Planet name: ' + planet.name + ' \n';
 
             game.add.text(
@@ -20,7 +20,7 @@ define(['Hydra/Socket/Client'], function (client) {
             );
             var back = game.add.text(
                 300,
-                70,
+                80,
                 "Back to Galaxy",
                 {font: "16px Arial", fill: "#ffff00", align: "center"}
             );
@@ -34,24 +34,42 @@ define(['Hydra/Socket/Client'], function (client) {
                 textContent += 'Population: ' + planet.population + '\n';
                 textContent += 'Gold: ' + planet.gold + '\n';
             } else {
-                var attack = game.add.text(
-                    300,
-                    90,
-                    "Attack!",
-                    {font: "16px Arial", fill: "#ff0044", align: "center"}
-                );
+                var attackingTextHeight = 100;
 
-                attack.inputEnabled = true;
-                attack.events.onInputDown.add(function () {
-                    client.getConnection().send(
-                        JSON.stringify({
-                            command: 'attack',
-                            username: game.player.username,
-                            planetName: game._selectedPlanet.name
-                        })
+                for (var i = 0; i < game.currentPlayerPlanets.length; i++) {
+                    var currentPlanet = game.currentPlayerPlanets[i];
+
+                    if (currentPlanet.fleet === undefined ||
+                        currentPlanet.fleet.squads === undefined ||
+                        !currentPlanet.fleet.squads.length) {
+                        continue;
+                    }
+
+                    var currentPlanetName = currentPlanet.planet.name;
+
+                    var attack = game.add.text(
+                        300,
+                        attackingTextHeight,
+                        "Attack from planet " + currentPlanetName,
+                        {font: "16px Arial", fill: "#ff0044", align: "center"}
                     );
-                    game.state.start('Game');
-                }, this);
+
+                    attackingTextHeight += 20;
+
+                    attack.inputEnabled = true;
+                    attack.events.onInputDown.add(function () {
+                        var command = {
+                            attackingPlanetName: currentPlanetName,
+                            attackedPlanetName: planet.name
+                        };
+
+                        console.log(command)
+                        client.getConnection().send(
+                            JSON.stringify(command)
+                        );
+                        game.state.start('Game');
+                    }, this);
+                }
             }
 
             _textLabel = game.add.text(50, 50, textContent, {
@@ -62,7 +80,7 @@ define(['Hydra/Socket/Client'], function (client) {
         update: function (game) {
             var planet = game._selectedPlanet.planet;
             var planetPlayer = game._selectedPlanet.player;
-            var myPlanet = planetPlayer != undefined && planetPlayer.name == game.player.username;
+            var myPlanet = planetPlayer !== undefined && planetPlayer.name === game.player.username;
             var textContent = 'Planet name: ' + planet.name + ' \n';
 
             if (myPlanet) {
@@ -71,38 +89,6 @@ define(['Hydra/Socket/Client'], function (client) {
             }
 
             _textLabel.text = textContent;
-        },
-        renderBuildingsText: function () {
-            var text = '';
-
-            if (game._selectedPlanet.buildings) {
-                text += 'Count buildings: ' + game._selectedPlanet.buildings.length + '\n';
-
-                for (var i = 0; i < game._selectedPlanet.buildings.length; i++) {
-                    text += 'Building name: ' + game._selectedPlanet.buildings[i].name;
-                    text += ' (time remaining ' + game._selectedPlanet.buildings[i].buildTimeRemaining + ' of ' + game._selectedPlanet.buildings[i].buildTime + ')\n';
-                }
-            } else {
-                text += 'Count buildings: ' + 0 + '\n';
-            }
-
-            return text;
-        },
-        renderShipsText: function () {
-            var text = '';
-
-            if (game._selectedPlanet.ships) {
-                text += 'Count ships: ' + game._selectedPlanet.ships.length + '\n';
-
-                for (var i = 0; i < game._selectedPlanet.ships.length; i++) {
-                    text += 'Ship: ' + game._selectedPlanet.ships[i].name + '\n';
-                    text += ' (time remaining ' + game._selectedPlanet.ships[i].buildTimeRemaining + ' of ' + game._selectedPlanet.ships[i].buildTime + ')\n';
-                }
-            } else {
-                text += 'Count ships: ' + 0 + '\n';
-            }
-
-            return text;
         }
     };
 });

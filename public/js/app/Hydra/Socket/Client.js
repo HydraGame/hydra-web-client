@@ -5,14 +5,14 @@ define(function () {
          * Cache the socket connection
          */
         if (!_socket) {
-            _socket = new WebSocket('ws://0.0.0.0:8081');
+            _socket = new WebSocket('ws://192.168.1.72:8088');
         }
 
         return _socket;
     };
 
     var _addMessageCallback = function(callback) {
-        _getSocket().onmessage = callback;
+        _getSocket().onmessage = callback
     };
 
     return {

@@ -16,7 +16,7 @@ define(['Hydra/UI/KeyboardCameraNavigator', 'Hydra/UI/Renderer'], function (keyb
 
             game.stage.bg = _bg;
 
-            if (game.player != undefined && game.player.username) {
+            if (game.player !== undefined && game.player.username) {
                 game.add.text(
                     20,
                     30,
