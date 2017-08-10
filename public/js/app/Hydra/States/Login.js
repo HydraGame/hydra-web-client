@@ -51,8 +51,7 @@ define(['Hydra/Socket/Client'], function (client) {
                 var p = players[i];
                 p.inputEnabled = true;
                 p.events.onInputDown.add(function (element) {
-                    game.player = {username: element.text}
-
+                    game.player = {username: element.text};
                     game.state.start('Game');
                 }, this);
             }

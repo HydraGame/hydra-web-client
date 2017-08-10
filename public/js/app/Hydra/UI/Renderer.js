@@ -19,9 +19,6 @@ define(['Hydra/Socket/Client'], function (client) {
      * - population: 1250
      * - size: medium (not used)
      * - position: {x: 500, y: 600}
-     *
-     * This onmessage method will eventually handle all
-     * communication between server / client
      */
     var _addMessageCallback = function () {
         client.addMessageCallback(function (e) {
@@ -41,27 +38,26 @@ define(['Hydra/Socket/Client'], function (client) {
                 return;
             }
             if (data.planets) {
-                console.log(e.data)
                 _serverPlanets = JSON.parse(e.data).planets;
+                _game.currentPlayerPlanets = [];
+
+                for (var i = 0; i < _serverPlanets.length; i++) {
+                    var gPlanet = _serverPlanets[i];
+
+                    if (gPlanet.player !== undefined && gPlanet.player.name === _game.player.username) {
+                        _game.currentPlayerPlanets.push(gPlanet);
+                    }
+                }
+
                 _createInitialPlanets();
-                _updateSelectedPlanet();
                 _renderPlanets();
             }
         });
     };
 
-    var _updateSelectedPlanet = function () {
-        if (_game._selectedPlanet) {
-            for (var k = 0; k < _serverPlanets.length; k++) {
-                if (_game._selectedPlanet.name == _serverPlanets[k].name) {
-                    _game._selectedPlanet = _serverPlanets[k];
-                    break;
-                }
-            }
-        }
-    };
-
     var _createInitialPlanets = function () {
+        _galaxy.children = [];
+
         if (!_galaxy.children.length) {
             for (var i = 0; i < _serverPlanets.length; i++) {
                 _createClientPlanet(_serverPlanets[i]);
@@ -70,9 +66,9 @@ define(['Hydra/Socket/Client'], function (client) {
     };
 
     var _createClientPlanet = function (serverPlanet) {
-        var player = serverPlanet.player
-        var fleet = serverPlanet.fleet
-        serverPlanet = serverPlanet.planet
+        var player = serverPlanet.player;
+        var fleet = serverPlanet.fleet;
+        serverPlanet = serverPlanet.planet;
         var planet = _game.add.image(serverPlanet.position.x, serverPlanet.position.y, 'planet-green');
         planet.name = serverPlanet.name;
 
@@ -83,10 +79,10 @@ define(['Hydra/Socket/Client'], function (client) {
             .replace(/\-\-+/g, '-')         // Replace multiple - with single -
             .replace(/^-+/, '')             // Trim - from start of text
             .replace(/-+$/, '');            // Trim - from end of text
-        }
+        };
 
         if (player && fleet) {
-            if (player != undefined && player.name == _game.player.username) {
+            if (player !== undefined && player.name === _game.player.username) {
                 for (i = 0; i < fleet.squads.length; i++) {
                     var squad = fleet.squads[i];
                     var yPos = serverPlanet.position.y - (20 * (i + 1)
@@ -109,7 +105,7 @@ define(['Hydra/Socket/Client'], function (client) {
     var _renderPlanets = function () {
         _galaxy.forEach(function (clientPlanet) {
             for (var j = 0; j < _serverPlanets.length; j++) {
-                if (_serverPlanets[j].planet.name == clientPlanet.name) {
+                if (_serverPlanets[j].planet.name === clientPlanet.name) {
                     _renderPlanet(clientPlanet, _serverPlanets[j]);
 
                     break;
@@ -121,7 +117,6 @@ define(['Hydra/Socket/Client'], function (client) {
     var _renderPlanet = function (clientPlanet, serverPlanet) {
         var usernameText = '';
         var populationText = '';
-        var myPlanet = false;
 
         if (serverPlanet.player) {
             usernameText = ' <' + serverPlanet.player.name + '> ';
@@ -129,15 +124,14 @@ define(['Hydra/Socket/Client'], function (client) {
 
         planet = serverPlanet.planet;
 
-        if (serverPlanet.player != undefined && serverPlanet.player.name == _game.player.username) {
-            myPlanet = true;
+        if (serverPlanet.player !== undefined && serverPlanet.player.name === _game.player.username) {
             populationText = ' [' + planet.population + ']'
         }
 
         var color = "#ffffff";
 
-        if (serverPlanet.player != undefined) {
-            if (serverPlanet.player.name == _game.player.username) {
+        if (serverPlanet.player !== undefined) {
+            if (serverPlanet.player.name === _game.player.username) {
                 color = "#3fef06";
             } else {
                 color = "#f07373";
@@ -147,7 +141,7 @@ define(['Hydra/Socket/Client'], function (client) {
         if (clientPlanet.children.length && clientPlanet.children[0].text) {
             clientPlanet.children[0].text = planet.name + usernameText + populationText;
 
-            clientPlanet.children[0].text.color = color
+            clientPlanet.children[0].style.fill = color;
         } else {
             var textLabel = _game.add.text(10, 10, planet.name + usernameText + populationText, {
                 font: "12px Arial",
@@ -162,7 +156,6 @@ define(['Hydra/Socket/Client'], function (client) {
             textLabel.y = clientPlanet.height + 2;
 
             clientPlanet.events.onInputDown.add(function (e) {
-                console.log("Ive selected" + serverPlanet.planet.name)
                 _game._selectedPlanet = serverPlanet;
                 _game.state.start('PlanetView');
             });
@@ -178,19 +171,6 @@ define(['Hydra/Socket/Client'], function (client) {
 
             _addMessageCallback();
             _initialized = true;
-
-            function sleep(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms))
-            }
-
-            async function loop() {
-                for (var i = 0; i < 1000; i++) {
-                    client.getConnection().send("get-galaxy")
-                    await sleep(500)
-                }
-            }
-
-            loop()
         },
     };
 });
