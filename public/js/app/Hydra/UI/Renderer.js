@@ -82,7 +82,7 @@ define(['Hydra/Socket/Client'], function (client) {
         };
 
         if (player && fleet) {
-            if (player !== undefined && player.name === _game.player.username) {
+            if (player !== undefined  && _game.player !== undefined && player.name === _game.player.username) {
                 for (i = 0; i < fleet.squads.length; i++) {
                     var squad = fleet.squads[i];
                     var yPos = serverPlanet.position.y - (20 * (i + 1)
