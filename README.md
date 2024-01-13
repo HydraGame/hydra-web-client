@@ -4,12 +4,24 @@
 
 ```mermaid
 graph TD;
-    GameServer-->Redis;
-    Redis<--WebsocketServer;
-    WebsocketServer<-->WebClient;
+    GameServer-->RedisDB;
+    WebsocketServer-->RedisDB;
+    WebClient<-->WebsocketServer
 ```
+
+## Dependencies
+- Scala & sbt
+- NodeJS
 
 ## Installation instructions
 
-Start a websocket server on port 8081.
-This is required to send data to the web client to render the planets.
+1. Start RedisDB
+`redis-server`
+
+2. Start game engine
+`sbt run`
+
+3. Start WebSocket server (port 8081)
+`node app.js`
+
+4. Open web client in browser
