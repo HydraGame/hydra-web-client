@@ -4,7 +4,7 @@
 
 ```mermaid
 graph TD;
-    Game Server-->Redis;
+    GameServer-->Redis;
     Redis<--WebsocketServer
     WebsocketServer<-->WebClient;
 ```
