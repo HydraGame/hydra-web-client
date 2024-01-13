@@ -1,5 +1,14 @@
 # Hydra web client
 
+## Architecture
+
+```mermaid
+graph TD;
+    Game Server-->Redis;
+    Redis<--WebsocketServer
+    WebsocketServer<-->WebClient;
+```
+
 ## Installation instructions
 
 Start a websocket server on port 8081.
