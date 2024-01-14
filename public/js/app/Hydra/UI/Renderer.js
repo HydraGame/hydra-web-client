@@ -72,24 +72,25 @@ define(['Hydra/Socket/Client'], function (client) {
         var planet = _game.add.image(serverPlanet.position.x, serverPlanet.position.y, 'planet-green');
         planet.name = serverPlanet.name;
 
-        var slugify = function(text) {
-          return text.toString().toLowerCase()
-            .replace(/\s+/g, '-')           // Replace spaces with -
-            .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-            .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-            .replace(/^-+/, '')             // Trim - from start of text
-            .replace(/-+$/, '');            // Trim - from end of text
+        var slugify = function (text) {
+            return text.toString().toLowerCase()
+                .replace(/\s+/g, '-')           // Replace spaces with -
+                .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+                .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                .replace(/^-+/, '')             // Trim - from start of text
+                .replace(/-+$/, '');            // Trim - from end of text
         };
 
+
         if (player && fleet) {
-            if (player !== undefined  && _game.player !== undefined && player.name === _game.player.username) {
+            if (player !== undefined && _game.player !== undefined && player.name === _game.player.username) {
                 for (i = 0; i < fleet.squads.length; i++) {
                     var squad = fleet.squads[i];
-                    var yPos = serverPlanet.position.y - (20 * (i + 1)
+                    var yPos = fleet.position.y - (20 * (i + 1)
                     );
 
                     for (j = 0; j < squad.count; j++) {
-                        var xPos = serverPlanet.position.x + j * 20;
+                        var xPos = fleet.position.x + j * 20
                         var gameShip = _game.add.image(xPos, yPos, slugify(squad.ship.name));
 
                         _galaxy.addChild(gameShip);

@@ -52,7 +52,7 @@ define(['Hydra/Socket/Client'], function (client) {
                 { font: "20px Arial", fill: "#00ff00", align: "center" }
             );
 
-            var players = [p1, p2, p3];
+            var players = [p1, p2, p3, p4];
 
             for (var i = 0; i < players.length; i++) {
                 var p = players[i];
